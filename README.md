@@ -10,5 +10,5 @@ The dataset was also filtered to isolate records from 2012 for focused analysis 
 A variety of visualizations were created to explore and interpret different aspects of the dataset.
 
 ### Tools
-- R, Rstudio
+- R, RStudio
 - dplyr, skimr, and ggplot2 libray to analyze the dataset.
