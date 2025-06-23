@@ -1,0 +1,150 @@
+---
+title: "Data Visualization_Bikeshare"
+author: "Mingi Um"
+date: "2023-10-12"
+output:
+  pdf_document:
+    latex_engine: xelatex
+  word_document: default
+---
+
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r message=FALSE,  warning=FALSE}
+library("tidyverse")
+library("skimr")
+library("dplyr")
+library("ggplot2")
+library("scales")
+```
+
+
+### 1.1 Loading the data and preparation
+```{r}
+# Load the data set
+# read the CSV file into a data frame 'bikesharingdata'
+bikesharingdata <- read_csv("bikesharedailydata.csv")
+
+# look at all the variables by using the skim function
+skim(bikesharingdata)  
+
+# We observe that the 'season' and 'mnth' columns each have one missing value.
+# We can omit these missing values as they are minimal and unlikely to impact the analysis.
+bikesharingdata_no_na <- na.omit(bikesharingdata)
+
+# Verify that missing values have been successfully omitted
+skim(bikesharingdata_no_na)
+```
+
+
+### 1.2 Define the color and characteristics of charts 
+```{r}
+# We define the color to use
+chartcolor <- "#00356b"
+
+# And then we create 'mychartattributes' to make the code more simple
+mychartattributes <- theme_bw() + theme(text=element_text(family="serif")) + theme(panel.border = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(), axis.line = element_line(color = "gray"), axis.ticks.x = element_blank(), axis.ticks.y = element_blank())
+
+# Filtering 2012 data
+bikesharingdata_2012 <- bikesharingdata_no_na %>% filter(yr == 1)
+```
+
+### 2.1 Bar chart
+
+```{r}
+# Bar chart with 2012 data
+
+ggplot(bikesharingdata_2012, aes(x=as.factor(mnth), y=cnt)) + geom_bar(stat="identity", fill = chartcolor) + scale_x_discrete(labels = c('1' = 'Jan', '2' = 'Feb', '3' = 'Mar', '4' = 'Apr', '5' = 'May', '6' = 'Jun', '7' = 'Jul', '8' = 'Aug', '9' = 'Sep', '10' = 'Oct', '11' = 'Nov', '12' = 'Dec')) + scale_y_continuous(labels = comma) + mychartattributes + labs(title = "Monthly Trend of Bike Rentals", subtitle = "Highlighting monthly variations in bike rentals for 2012", caption = "Bar chart represents the total number of bike rentals per month, indicating noticeable fluctuations and potentially identifying peak usage periods", x = "Month", y = "Rentals")
+
+```
+
+### 2.2 Line chart
+
+```{r}
+# Line chart with 2012 data
+
+linechart_bikeshare <- ggplot(bikesharingdata_2012, aes(x=as.Date(dteday, format="%m/%d/%y"), y=cnt)) + 
+  geom_line(color = chartcolor) + 
+  scale_x_date(date_labels = "%b", date_breaks = "1 month") + 
+  scale_y_continuous(labels = comma) + 
+  labs(title = "Daily Trend of Bike Rentals in 2012", 
+       subtitle = "Observing fluctuations and patterns in daily rentals", 
+       caption = "Line chart represents daily rental counts, providing a detailed view of its variability throughout the year.", 
+       x = "Month", 
+       y = "Rentals") + mychartattributes
+
+linechart_bikeshare
+```
+
+### 2.3 Stacked area chart
+
+```{r}
+# Area chart with 2012 data
+
+areachart_bikeshare <- ggplot(bikesharingdata_2012, aes(x=as.Date(dteday, format="%m/%d/%y"), y=cnt)) + 
+  geom_area(fill = chartcolor) + 
+  scale_x_date(date_labels = "%b", date_breaks = "1 month") + 
+  scale_y_continuous(labels = comma) + 
+  labs(title = "Daily Trend of Bike Rentals in 2012", 
+       subtitle = "Visualizing the magnitude and flow of daily rentals", 
+       caption = "Area chart explains the volume of daily bike rentals, unfolding the progression and potential peaks throughout the year.", 
+       x = "Day", 
+       y = "Rentals") + 
+  mychartattributes
+
+areachart_bikeshare
+
+```
+
+### 2.4 Histogram
+```{r}
+# Histogram
+
+hist_bikeshare <- ggplot(bikesharingdata_no_na, aes(x=cnt)) + geom_histogram(binwidth = 100, fill = chartcolor) + labs(title = "Distribution of Daily Bike Rentals", subtitle = "Examining the frequency distribution of rental counts", caption = "Histogram displays the distribution of rental counts", x = "Rentals", y = "Frequency") + mychartattributes + scale_x_continuous(labels = comma)
+hist_bikeshare
+
+```
+
+### 2.5 Density plot
+```{r}
+# Density plot
+
+densityplot_bikeshare <- ggplot(bikesharingdata_no_na, aes(x=cnt)) + geom_density(fill = chartcolor, color=chartcolor) + labs(title = "Density of Bike Rentals", subtitle = "the Density and central tendency of bike rentals", caption = "The chart provides insight into the pattern and concentration of the overall rental distributions", x = "Rentals", y = "Density") + mychartattributes + scale_x_continuous(labels = comma) + geom_vline(xintercept = round(mean(bikesharingdata_no_na$cnt), 2), size = 1, color = "#999999", linetype = "dotted")
+
+densityplot_bikeshare
+```
+
+### 2.6 Boxplot
+
+```{r}
+# Boxplot with 2012 data
+
+boxplot_bikeshare <- ggplot(bikesharingdata_2012, aes(x=as.factor(mnth), y=cnt)) + geom_boxplot(color = chartcolor, outlier.color = "red") + scale_x_discrete(labels = c('1' = 'Jan', '2' = 'Feb', '3' = 'Mar', '4' = 'Apr', '5' = 'May', '6' = 'Jun', '7' = 'Jul', '8' = 'Aug', '9' = 'Sep', '10' = 'Oct', '11' = 'Nov', '12' = 'Dec')) + scale_y_continuous(labels = comma) + mychartattributes + labs(title = "Monthly Trend of Bike Rentals", subtitle = "Boxplots representing monthly distributions of rentals in 2012", caption = "Each boxplot visualizes the central tendency and variability of rentals each month, offering insights into seasonal rental patterns", x = "Month", y = "Rentals")
+
+
+boxplot_bikeshare
+```
+
+### 2.7 Scatterplot chart
+
+```{r}
+# Scatterplot with 2012 data
+
+scatter_bikeshare <- ggplot(bikesharingdata_2012, aes(x=as.Date(dteday, format="%m/%d/%y"), y=cnt)) +
+  geom_point(color = chartcolor) +
+  labs(title = "Scatterplot of Daily Bike Rentals in 2012",
+       subtitle = "Exploring the Day-to-Day variability in rental counts",
+       caption = "Scatterplot illuminates the daily fluctuations in bike rentals, pinpointing specific days with spikes or drops.",
+       x = "Day",
+       y = "Rentals") +
+  scale_x_date(date_labels = "%b", date_breaks = "1 month") +
+  scale_y_continuous(labels = comma) +
+  mychartattributes
+
+scatter_bikeshare
+
+```
