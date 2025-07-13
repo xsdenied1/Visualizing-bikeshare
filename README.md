@@ -11,4 +11,4 @@ A variety of visualizations were created to explore and interpret different aspe
 
 ### Tools
 - R, RStudio
-- dplyr, skimr, and ggplot2 libray to analyze the dataset.
+- dplyr, skimr, and ggplot2 library to analyze the dataset.
